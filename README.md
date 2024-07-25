@@ -1,130 +1,178 @@
-# Zeno Web Crawler
+# Zeno: State-of-the-Art Web Crawler 🔱
 
-Zeno is a state-of-the-art web crawler designed for both wide crawls and single-page archiving. Its key concepts are portability, performance, and simplicity, with a strong emphasis on performance.
+Zeno is a cutting-edge web crawler designed for both wide-scale crawls and single-page archiving. Named after Zenodotus, the first librarian of the ancient Library of Alexandria, Zeno embodies the spirit of knowledge preservation in the digital age.
 
-## Table of Contents
+## Introduction
 
-1. [Installation](#installation)
-2. [Usage](#usage)
-3. [Commands](#commands)
-   - [get](#get)
-   - [get url](#get-url)
-   - [get list](#get-list)
-   - [get hq](#get-hq)
-4. [Configuration](#configuration)
-5. [Authors](#authors)
+Originally developed by Corentin Barreau at the Internet Archive, Zeno stands on three pillars:
 
-## Installation
+1. Portability
+2. Performance
+3. Simplicity
 
-(Include installation instructions here)
+With a strong emphasis on performance, Zeno leverages the powerful `warc` module for efficient traffic recording into WARC files, ensuring high-fidelity web archiving.
+
+## Features
+
+- Extract URLs from WARC files
+- Fetch web pages with configurable concurrency
+- Process and analyze web archive data
+- Highly configurable with multiple configuration methods
+- Headless browsing capability for JavaScript-rendered content
+- Intelligent concurrency control
+- Time-limited crawls
+- CDX deduplication
+- Prometheus integration for metrics
+- API access for crawl control
+
+## Getting Started
+
+### Prerequisites
+
+- Go 1.18+ installed on your machine
+- Access to web pages or WARC files for processing
+
+### Installation
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/internetarchive/Zeno.git
+    cd Zeno
+    ```
+
+2. Build the project:
+    ```bash
+    go build -o zeno
+    ```
 
 ## Usage
 
-To use Zeno, run the following command:
+Zeno's powerful features are accessible through an intuitive command-line interface. To get started, simply run:
 
-```
-Zeno [command] [flags]
-```
-
-If no command is provided, Zeno will display the help information.
-
-## Commands
-
-### get
-
-The `get` command is used to archive web content. It has three subcommands: `url`, `list`, and `hq`.
-
-#### get url
-
-Archive specific URLs.
-
-```
-Zeno get url [URL...] [flags]
+```bash
+./zeno [command] [flags]
 ```
 
-This command takes one or more URLs as arguments and archives them.
+For a comprehensive list of commands and options, use:
 
-#### get list
-
-Start crawling with a seed list.
-
-```
-Zeno get list [FILE] [flags]
+```bash
+./zeno -h
 ```
 
-This command takes a file containing a list of URLs as input and starts crawling from those seed URLs.
+### Commands
 
-#### get hq
+Zeno offers several commands to cater to different archiving needs:
 
-Start crawling with the crawl HQ connector.
+#### get
 
+The `get` command is the heart of Zeno, used for archiving web content. It offers three specialized subcommands:
+
+##### get url
+
+Archive specific URLs:
+
+```bash
+./zeno get url [URL...] [flags]
 ```
-Zeno get hq [flags]
+
+##### get list
+
+Start crawling with a seed list:
+
+```bash
+./zeno get list [FILE] [flags]
 ```
 
-This command uses the Crawl HQ system to manage the crawl.
+##### get hq
 
-## Configuration
+Leverage the power of Crawl HQ for managed crawls:
 
-Zeno supports multiple configuration methods with the following precedence (highest to lowest):
+```bash
+./zeno get hq [flags]
+```
+
+#### version
+
+Display the current version of Zeno:
+
+```bash
+./zeno version
+```
+
+#### help
+
+Access help information for any command:
+
+```bash
+./zeno help [command]
+```
+
+### Configuration
+
+Zeno offers unparalleled flexibility in configuration, supporting multiple methods with a clear precedence:
 
 1. Command-line flags
 2. Environment variables
 3. Configuration file
 4. Consul configuration
 
-### Configuration File
+#### Configuration File
 
-By default, Zeno looks for a configuration file named `zeno-config.yaml` in the user's home directory. You can specify a different configuration file using the `--config-file` flag.
+By default, Zeno looks for a `zeno-config.yaml` file in the user's home directory. Customize the config file location with the `--config-file` flag.
 
-### Environment Variables
+#### Environment Variables
 
-Zeno uses environment variables prefixed with `ZENO_`. Hyphens in flag names are replaced with underscores. For example, `--log-level` becomes `ZENO_LOG_LEVEL`.
+Easily integrate Zeno into your workflow using environment variables prefixed with `ZENO_`. For example, set the log level with `ZENO_LOG_LEVEL`.
 
-### Consul Configuration
+#### Key Configuration Options
 
-To use Consul for configuration, set the `--consul-config` flag to true and provide the `--consul-address` flag with the Consul server address.
+- `--user-agent`: Customize the User-Agent string (default: "Zeno")
+- `--workers, -w`: Set the number of concurrent workers (default: 1)
+- `--max-hops`: Limit the crawl depth (default: 0, unlimited)
+- `--headless`: Use headless browsers for JavaScript-heavy sites
+- `--warc-prefix`: Customize WARC file naming (default: "ZENO")
+- `--proxy`: Specify a proxy for network requests
+- `--hq-address`: Connect to a Crawl HQ instance for advanced crawl management
 
-### Configuration Options
+For a full list of options, refer to the output of `./zeno -h` or check the `Config` struct in `config.go`.
 
-Here are some of the key configuration options available:
+### Example
 
-- `log-level`: Set the stdout log level (debug, info, warn, error)
-- `user-agent`: Set the User-Agent string for requests
-- `job`: Job name to use for persistent queue, seencheck database, and WARC files
-- `workers`: Number of concurrent workers to run
-- `max-hops`: Maximum number of hops to execute
-- `headless`: Use headless browsers instead of standard GET requests
-- `warc-prefix`: Prefix for WARC files
-- `proxy`: Proxy to use for requests
-- `hq-address`: Crawl HQ address
-- `hq-key`: Crawl HQ key
-- `hq-secret`: Crawl HQ secret
-- `hq-project`: Crawl HQ project
+Here is an example of how to run Zeno to crawl a list of URLs:
 
-For a complete list of configuration options, refer to the `Config` struct in the `config.go` file or run `Zeno get --help`.
+```bash
+./zeno get list seed_urls.txt --workers 10 --max-hops 3 --warc-prefix "MY_CRAWL"
+```
 
-### Special Behaviors
+## Files in the Repository
 
-- If `live-stats` is enabled, stdout logging is automatically disabled.
-- If `prometheus` is enabled, the API is automatically enabled.
+- `cmd/`: Contains command-related files (`cmd.go`, `get.go`, `get_hq.go`, `get_list.go`, `get_url.go`)
+- `config/`: Configuration-related files (`config.go`)
+- `internal/pkg/`: Core functionality packages
+- `main.go`: Main entry point for Zeno
+- `main_test.go`: Tests for the main functionality
+- `README.md`: This file
+- `LICENSE`: License information
 
-### Aliases
+## Contributing
 
-Some flags have aliases for backward compatibility:
+Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
 
-- `hops` is an alias for `max-hops`
-- `ca` is an alias for `max-concurrent-assets`
-- `msr` is an alias for `min-space-required`
+## Authors and Contributors
 
-These aliases are deprecated and should be avoided in new configurations.
+Zeno is the result of collaborative effort from talented developers:
 
-## Authors
+- Corentin Barreau ([@CorentinB](https://github.com/CorentinB)) - Original creator
+- Jake LaFountain ([@NGTmeaty](https://github.com/NGTmeaty))
+- Thomas Foubert ([@equals215](https://github.com/equals215))
 
-- Corentin Barreau <corentin@archive.org>
-- Jake LaFountain <jakelf@archive.org>
-- Thomas Foubert <thomas@archive.org>
+## License
+
+This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-This updated documentation incorporates the configuration details from the `config.go` file, providing a more comprehensive overview of Zeno's configuration system and options. Users can refer to this documentation to understand how to configure Zeno for their specific needs.
+Join the Zeno community! Star the [GitHub repository](https://github.com/internetarchive/Zeno), watch for updates, or contribute to its development. Whether you're preserving a single page or embarking on a web-wide crawl, Zeno provides the power, flexibility, and efficiency you need. Start exploring the web's past and present with Zeno today!
+```
+
+This README.md now combines the detailed information about Zeno with the structure of a typical GitHub project README, making it both informative and easy to navigate for potential users and contributors.
