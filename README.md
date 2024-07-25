@@ -1,178 +1,174 @@
-# Zeno: State-of-the-Art Web Crawler 🔱
+# Zeno 🔱
 
-Zeno is a cutting-edge web crawler designed for both wide-scale crawls and single-page archiving. Named after Zenodotus, the first librarian of the ancient Library of Alexandria, Zeno embodies the spirit of knowledge preservation in the digital age.
+Zeno is a state-of-the-art web crawler designed for wide crawls or single web page archiving. Its key concepts are portability, performance, and simplicity, with a strong emphasis on performance.
 
 ## Introduction
 
-Originally developed by Corentin Barreau at the Internet Archive, Zeno stands on three pillars:
-
-1. Portability
-2. Performance
-3. Simplicity
-
-With a strong emphasis on performance, Zeno leverages the powerful `warc` module for efficient traffic recording into WARC files, ensuring high-fidelity web archiving.
+Zeno was originally developed by Corentin Barreau at the Internet Archive. It heavily relies on the warc module for traffic recording into WARC (Web ARChive) files. The name Zeno comes from Zenodotus (Ζηνόδοτος), a Greek grammarian, literary critic, Homeric scholar, and the first librarian of the Library of Alexandria.
 
 ## Features
 
-- Extract URLs from WARC files
-- Fetch web pages with configurable concurrency
-- Process and analyze web archive data
-- Highly configurable with multiple configuration methods
-- Headless browsing capability for JavaScript-rendered content
-- Intelligent concurrency control
-- Time-limited crawls
+- Concurrent crawling with configurable number of workers
+- Customizable user agent
+- Cookie handling and global cookie jar support
+- Headless browser support
+- Local seen-check to avoid re-crawling
+- JSON logging
+- Live statistics
+- API support with Prometheus metrics export
+- Configurable redirect and retry limits
+- Domain-specific crawling
+- HTML tag filtering
+- Proxy support with bypass options
+- WARC file generation with customizable settings
 - CDX deduplication
-- Prometheus integration for metrics
-- API access for crawl control
+- ElasticSearch integration for crawl logs
+- Crawl HQ integration for URL management
+- Configurable crawl time limits
+- Disk space management
 
-## Getting Started
+## Installation
 
-### Prerequisites
-
-- Go 1.18+ installed on your machine
-- Access to web pages or WARC files for processing
-
-### Installation
-
-1. Clone the repository:
-    ```bash
-    git clone https://github.com/internetarchive/Zeno.git
-    cd Zeno
-    ```
-
-2. Build the project:
-    ```bash
-    go build -o zeno
-    ```
+[Provide installation instructions here]
 
 ## Usage
 
-Zeno's powerful features are accessible through an intuitive command-line interface. To get started, simply run:
+Zeno provides several subcommands for different crawling scenarios:
 
-```bash
-./zeno [command] [flags]
+### Basic Usage
+
+To see all available commands and options:
+
+```
+./Zeno -h
 ```
 
-For a comprehensive list of commands and options, use:
+### Crawling Specific URLs
 
-```bash
-./zeno -h
+To crawl specific URLs:
+
+```
+./Zeno get url [URL...]
 ```
 
-### Commands
+### Crawling from a Seed List
 
-Zeno offers several commands to cater to different archiving needs:
+To crawl using a seed list:
 
-#### get
-
-The `get` command is the heart of Zeno, used for archiving web content. It offers three specialized subcommands:
-
-##### get url
-
-Archive specific URLs:
-
-```bash
-./zeno get url [URL...] [flags]
+```
+./Zeno get list [FILE]
 ```
 
-##### get list
+### Crawling with Crawl HQ
 
-Start crawling with a seed list:
+To start crawling with the Crawl HQ connector:
 
-```bash
-./zeno get list [FILE] [flags]
+```
+./Zeno get hq [options]
 ```
 
-##### get hq
+## Configuration
 
-Leverage the power of Crawl HQ for managed crawls:
-
-```bash
-./zeno get hq [flags]
-```
-
-#### version
-
-Display the current version of Zeno:
-
-```bash
-./zeno version
-```
-
-#### help
-
-Access help information for any command:
-
-```bash
-./zeno help [command]
-```
-
-### Configuration
-
-Zeno offers unparalleled flexibility in configuration, supporting multiple methods with a clear precedence:
+Zeno supports a flexible configuration system with the following priority order:
 
 1. Command-line flags
-2. Environment variables
-3. Configuration file
-4. Consul configuration
+2. Environment variables (prefixed with `ZENO_`)
+3. Configuration file (`zeno-config.yaml` in the user's home directory by default)
+4. Consul configuration (if enabled)
 
-#### Configuration File
+### Key Configuration Options
 
-By default, Zeno looks for a `zeno-config.yaml` file in the user's home directory. Customize the config file location with the `--config-file` flag.
+- `--log-level`: Set the logging level (default: "info")
+- `--user-agent`: Custom user agent (default: "Zeno")
+- `--job`: Job name for persistent queue, seencheck database, and WARC files
+- `--workers, -w`: Number of concurrent workers (default: 1)
+- `--max-concurrent-assets`: Max concurrent assets per worker (default: 8)
+- `--max-hops`: Maximum number of hops to execute (default: 0)
+- `--headless`: Use headless browsers instead of standard GET requests
+- `--local-seencheck`: Enable local seen-check to avoid re-crawling
+- `--json`: Output logs in JSON format
+- `--debug`: Enable debug logging
+- `--live-stats`: Enable live statistics (disables standard logging)
+- `--api`: Enable API for monitoring
+- `--prometheus`: Export metrics in Prometheus format
+- `--domains-crawl`: Treat seeds as domains to crawl
+- `--proxy`: Specify a proxy for requests
+- `--bypass-proxy`: Domains that should not be proxied
+- `--crawl-time-limit`: Set a time limit for the crawl in seconds
+- `--min-space-required`: Minimum space required in GB to continue the crawl (default: 20)
+- `--http-timeout`: Number of seconds to wait before timing out a request (default: 30)
+- `--max-concurrent-per-domain`: Maximum number of concurrent requests per domain (default: 16)
+- `--concurrent-sleep-length`: Milliseconds to sleep when max concurrency per domain is reached (default: 500)
 
-#### Environment Variables
+### WARC Configuration
 
-Easily integrate Zeno into your workflow using environment variables prefixed with `ZENO_`. For example, set the log level with `ZENO_LOG_LEVEL`.
+- `--warc-prefix`: Set the prefix for WARC filenames (default: "ZENO")
+- `--warc-operator`: Specify contact information for the crawl operator
+- `--warc-cdx-dedupe-server`: Enable CDX deduplication and specify the server
+- `--warc-on-disk`: Store WARC data on disk instead of RAM
+- `--warc-pool-size`: Set the number of concurrent WARC files to write (default: 1)
+- `--warc-temp-dir`: Specify a custom directory for WARC temporary files
+- `--warc-dedupe-size`: Set the minimum size for WARC record deduplication (default: 1024 bytes)
+- `--disable-local-dedupe`: Disable local URL agnostic deduplication
+- `--cert-validation`: Enables certificate validation on HTTPS requests
 
-#### Key Configuration Options
+### Crawl HQ Configuration
 
-- `--user-agent`: Customize the User-Agent string (default: "Zeno")
-- `--workers, -w`: Set the number of concurrent workers (default: 1)
-- `--max-hops`: Limit the crawl depth (default: 0, unlimited)
-- `--headless`: Use headless browsers for JavaScript-heavy sites
-- `--warc-prefix`: Customize WARC file naming (default: "ZENO")
-- `--proxy`: Specify a proxy for network requests
-- `--hq-address`: Connect to a Crawl HQ instance for advanced crawl management
+- `--hq-address`: Crawl HQ address
+- `--hq-key`: Crawl HQ key
+- `--hq-secret`: Crawl HQ secret
+- `--hq-project`: Crawl HQ project
+- `--hq-batch-size`: Crawl HQ feeding batch size
+- `--hq-continuous-pull`: Enable continuous URL pulling from Crawl HQ
+- `--hq-strategy`: Crawl HQ feeding strategy (default: "lifo")
+- `--hq-rate-limiting-send-back`: Send back rate-limited URLs to Crawl HQ
 
-For a full list of options, refer to the output of `./zeno -h` or check the `Config` struct in `config.go`.
+### ElasticSearch Configuration
 
-### Example
+- `--es-url`: Comma-separated ElasticSearch URLs for log indexing
+- `--es-user`: ElasticSearch username
+- `--es-password`: ElasticSearch password
+- `--es-index-prefix`: ElasticSearch index prefix (default: "zeno")
 
-Here is an example of how to run Zeno to crawl a list of URLs:
+## WARC Processing
 
-```bash
-./zeno get list seed_urls.txt --workers 10 --max-hops 3 --warc-prefix "MY_CRAWL"
-```
+Zeno generates WARC (Web ARChive) files during crawling. The WARC writer is initialized at the start of the crawl process. Key features include:
 
-## Files in the Repository
+- Configurable WARC file naming with customizable prefix
+- GZIP compression
+- CDX deduplication support
+- Local deduplication option
+- On-disk or in-memory processing
+- Concurrent WARC file writing
 
-- `cmd/`: Contains command-related files (`cmd.go`, `get.go`, `get_hq.go`, `get_list.go`, `get_url.go`)
-- `config/`: Configuration-related files (`config.go`)
-- `internal/pkg/`: Core functionality packages
-- `main.go`: Main entry point for Zeno
-- `main_test.go`: Tests for the main functionality
-- `README.md`: This file
-- `LICENSE`: License information
+## Crawl Process
+
+1. The crawl starts by initializing the frontier, which manages the URLs to be crawled.
+2. WARC writer is initialized with the specified settings.
+3. HTTP client is set up for making requests and recording them in WARC format.
+4. If specified, a proxy HTTP client is also initialized.
+5. Workers are started to process URLs from the frontier.
+6. If Crawl HQ is used, background processes for pulling and pushing seeds are started.
+7. The crawl continues until it reaches the time limit or there are no more URLs to process.
+
+## API and Monitoring
+
+When enabled, Zeno provides an API for monitoring the crawl progress. Prometheus metrics can be exported for more detailed monitoring and alerting.
 
 ## Contributing
 
-Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
-
-## Authors and Contributors
-
-Zeno is the result of collaborative effort from talented developers:
-
-- Corentin Barreau ([@CorentinB](https://github.com/CorentinB)) - Original creator
-- Jake LaFountain ([@NGTmeaty](https://github.com/NGTmeaty))
-- Thomas Foubert ([@equals215](https://github.com/equals215))
+[Provide information on how to contribute to the project]
 
 ## License
 
-This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+[Specify the license information]
 
----
+## Authors
 
-Join the Zeno community! Star the [GitHub repository](https://github.com/internetarchive/Zeno), watch for updates, or contribute to its development. Whether you're preserving a single page or embarking on a web-wide crawl, Zeno provides the power, flexibility, and efficiency you need. Start exploring the web's past and present with Zeno today!
-```
+- Corentin Barreau
+- Jake LaFountain
+- Thomas Foubert
 
-This README.md now combines the detailed information about Zeno with the structure of a typical GitHub project README, making it both informative and easy to navigate for potential users and contributors.
+## Acknowledgments
+
+Zeno relies heavily on the warc module for traffic recording into WARC files.
