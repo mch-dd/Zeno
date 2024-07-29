@@ -1,10 +1,4 @@
-# Zeno 🔱
-
-Zeno is a state-of-the-art web crawler designed for wide crawls or single web page archiving. Its key concepts are portability, performance, and simplicity, with a strong emphasis on performance.
-
-## Introduction
-
-Zeno was originally developed by Corentin Barreau at the Internet Archive. It heavily relies on the warc module for traffic recording into WARC (Web ARChive) files. The name Zeno comes from Zenodotus (Ζηνόδοτος), a Greek grammarian, literary critic, Homeric scholar, and the first librarian of the Library of Alexandria.
+# Admin Crawler
 
 ## Features
 
