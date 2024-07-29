@@ -1,4 +1,6 @@
-# Admin Crawler
+# Admin Crawler (Zeno)
+
+Admin Crawler, also known as Zeno, is a flexible tool designed for agnostic scraping of administrative documents. It comes with a variety of features to ensure efficient and thorough web crawling.
 
 ## Features
 
@@ -21,19 +23,15 @@
 - Configurable crawl time limits
 - Disk space management
 
-## Installation
-
-[Provide installation instructions here]
-
 ## Usage
 
-Zeno provides several subcommands for different crawling scenarios:
+InterCambly provides several subcommands for different crawling scenarios:
 
 ### Basic Usage
 
 To see all available commands and options:
 
-```
+```sh
 ./Zeno -h
 ```
 
@@ -41,7 +39,7 @@ To see all available commands and options:
 
 To crawl specific URLs:
 
-```
+```sh
 ./Zeno get url [URL...]
 ```
 
@@ -49,7 +47,7 @@ To crawl specific URLs:
 
 To crawl using a seed list:
 
-```
+```sh
 ./Zeno get list [FILE]
 ```
 
@@ -57,13 +55,13 @@ To crawl using a seed list:
 
 To start crawling with the Crawl HQ connector:
 
-```
+```sh
 ./Zeno get hq [options]
 ```
 
 ## Configuration
 
-Zeno supports a flexible configuration system with the following priority order:
+InterCambly supports a flexible configuration system with the following priority order:
 
 1. Command-line flags
 2. Environment variables (prefixed with `ZENO_`)
@@ -148,14 +146,6 @@ Zeno generates WARC (Web ARChive) files during crawling. The WARC writer is init
 ## API and Monitoring
 
 When enabled, Zeno provides an API for monitoring the crawl progress. Prometheus metrics can be exported for more detailed monitoring and alerting.
-
-## Contributing
-
-[Provide information on how to contribute to the project]
-
-## License
-
-[Specify the license information]
 
 ## Authors
 
